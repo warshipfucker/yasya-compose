@@ -7,6 +7,8 @@ WORKDIR /app
 
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
+ENV PATH="/usr/local/lib/python3.9/site-packages:${PATH}"
+
 COPY . /app/
 
 
