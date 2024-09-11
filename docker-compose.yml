@@ -18,7 +18,7 @@ services:
       
   mongo-logs-service:
     build:
-      context: ./logs-service
+      context: ./mongo-logs-service
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
