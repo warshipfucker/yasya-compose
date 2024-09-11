@@ -1,0 +1,28 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Set up Docker Compose
+    - name: Set up Docker Compose
+      run: sudo apt-get install docker-compose -y
+
+    # Build and bring up the services using Docker Compose
+    - name: Build and start services
+      run: docker-compose -f docker-compose.yml up --build -d
+      
+    # Stop and clean up
+    - name: Stop services
+      run: docker-compose down
