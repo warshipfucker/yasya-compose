@@ -1,0 +1,35 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Build the Docker Compose services
+      - name: Build Docker Compose
+        run: docker-compose -f docker-compose.yml up --build -d frontend-nginx-service
+      
+      # Copy the frontend static files to a directory
+      - name: Copy static files
+        run: |
+          docker cp $(docker-compose ps -q frontend-nginx-service):/usr/share/nginx/html ./public
+
+      # Upload to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          PUBLISH_DIR: ./public
