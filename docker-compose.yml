@@ -1,0 +1,16 @@
+services:
+  backend-flask-service:
+    build: 
+      context: ./backend-flask-service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+  
+  frontend-nginx-service:
+    build:
+      context: ./frontend-nginx-service
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-flask-service
