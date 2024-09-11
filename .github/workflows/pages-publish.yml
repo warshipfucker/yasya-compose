@@ -13,11 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # Set up Docker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      # Install Docker Compose
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
 
-      # Build the Docker Compose services
+      # Build and run the frontend-nginx-service
       - name: Build Docker Compose
         run: docker-compose -f docker-compose.yml up --build -d frontend-nginx-service
       
