@@ -1,30 +1,26 @@
-import logging
+from flask import Flask, request, jsonify
 from pymongo import MongoClient
-from flask import Flask
 
 app = Flask(__name__)
 
-# MongoDB connection
+# Подключение к MongoDB
 client = MongoClient('mongodb://mongodb:27017/')
 db = client.logs
-log_collection = db.backend_logs
+log_collection = db.logs
 
-# Log handler that sends logs to MongoDB
-class MongoHandler(logging.Handler):
-    def emit(self, record):
-        log_entry = self.format(record)
-        log_collection.insert_one({"log": log_entry})
+@app.route('/log', methods=['POST'])
+def collect_log():
+    log_data = request.json
+    if not log_data or 'message' not in log_data:
+        return jsonify({"error": "Invalid log data"}), 400
 
-# Configure logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-mongo_handler = MongoHandler()
-logger.addHandler(mongo_handler)
+    log_collection.insert_one({"message": log_data['message'], "level": log_data.get('level', 'INFO')})
+    return jsonify({"status": "Log stored successfully"}), 201
 
-@app.route('/')
-def home():
-    logger.info('Home page accessed')
-    return "Hello from Flask!"
+@app.route('/logs', methods=['GET'])
+def get_logs():
+    logs = list(log_collection.find({}, {'_id': 0}))
+    return jsonify(logs), 200
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=5000)
